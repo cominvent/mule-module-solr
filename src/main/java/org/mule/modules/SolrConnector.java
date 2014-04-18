@@ -16,13 +16,14 @@
 
 package org.mule.modules;
 
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
@@ -39,7 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URI;
 import java.util.*;
 
@@ -95,7 +96,7 @@ public class SolrConnector {
     @Connect
     public synchronized void connect() throws ConnectionException {
         try {
-            CommonsHttpSolrServer httpClientServer = new CommonsHttpSolrServer(serverUrl);
+            HttpSolrServer httpClientServer = new HttpSolrServer(serverUrl);
 
 
             //if there are credentials, then set them.
@@ -104,12 +105,14 @@ public class SolrConnector {
                 //set BASIC authentication on the underlying HTTP client.
                 URI uri = new URI(serverUrl);
                 AuthScope scope = new AuthScope(uri.getHost(), uri.getPort());
-                httpClientServer.getHttpClient().getState().setCredentials(scope, new UsernamePasswordCredentials(username, password));
+                DefaultHttpClient defaultClient = (DefaultHttpClient) httpClientServer.getHttpClient();
+                defaultClient.getCredentialsProvider().setCredentials(scope, new UsernamePasswordCredentials(username, password));
+
             }
 
 
             this.server = httpClientServer;
-        } catch (MalformedURLException ex) {
+        } catch (URISyntaxException ex) {
             logger.error("The url: " + serverUrl + " is malformed.");
             throw new ConnectionException(ConnectionExceptionCode.UNKNOWN, ex.getMessage(), "Url is not properly written", ex);
         } catch (Exception ex) {

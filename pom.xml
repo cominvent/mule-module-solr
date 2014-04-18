@@ -11,6 +11,7 @@
     <properties>
         <mule.version>3.3.0</mule.version>
         <mule.devkit.version>3.3.0</mule.devkit.version>
+        <solr.version>4.7.1</solr.version>
         <junit.version>4.9</junit.version>
         <mockito.version>1.8.2</mockito.version>
         <jdk.version>1.6</jdk.version>
@@ -184,7 +185,7 @@
         <dependency>
             <groupId>org.apache.solr</groupId>
             <artifactId>solr-solrj</artifactId>
-            <version>3.1.0</version>
+            <version>${solr.version}</version>
             <!-- exclude nasty dependencies -->
             <exclusions>
                 <exclusion>
