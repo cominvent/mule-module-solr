@@ -203,7 +203,9 @@ public class SolrConnector {
                                @Optional @Placement(group = "Sort Fields") @FriendlyName("Sort Fields") Map<String, SolrQuery.ORDER> sortFields) throws SolrModuleException {
 
         SolrQuery query = new SolrQuery(q);
-        query.setQueryType(handler);
+        if ( null!=handler && ! handler.equals("/select") ) {
+            query.setQueryType(handler);
+        }
 
         applyHighlightingLogic(query, highlightField, highlightSnippets);
         applyFacetingLogic(query, facetFields, facetLimit, facetMinCount);
